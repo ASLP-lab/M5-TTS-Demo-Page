@@ -7,21 +7,61 @@
     fr: { name: 'French', native: 'Français' },
     ja: { name: 'Japanese', native: '日本語' },
     ko: { name: 'Korean', native: '한국어' },
-    zh_sichuan: { name: 'Sichuanese', native: '四川话', textLang: 'zh-CN', isDialect: true }
+    zh: { name: 'Chinese', native: '中文', textLang: 'zh-CN' },
+    zh_sichuan: { name: 'Sichuanese', native: '四川话', textLang: 'zh-CN', isDialect: true },
+    yue: { name: 'Cantonese', native: '粤语', textLang: 'yue', isDialect: true }
   };
   const modelNames = { reference: 'Reference prompt', m5: 'M5-TTS', moss: 'MOSS-TTS-Nano' };
   const samples = Array.isArray(window.M5_SAMPLES) ? window.M5_SAMPLES : [];
+  const chineseSamples = Array.isArray(window.M5_CHINESE_SAMPLES) ? window.M5_CHINESE_SAMPLES : [];
+  const chineseGroups = {
+    normal: {
+      name: 'Everyday speech',
+      categories: {
+        lang_zh: { name: 'Mandarin', description: 'Everyday Chinese sentences and natural spoken phrasing.' },
+        codeswitch: { name: 'Code-switching', description: 'Chinese sentences with embedded words and phrases from other languages.' }
+      }
+    },
+    emotion: {
+      name: 'Emotion',
+      categories: {
+        emotion_joy: { name: 'Joy', description: 'Listen for the energy, warmth, and intonation of joyful speech.' },
+        emotion_sad: { name: 'Sadness', description: 'Listen for changes in pace, tone, and delivery in sad speech.' },
+        emotion_angry: { name: 'Anger', description: 'Compare the emphasis and intensity of emotionally charged delivery.' },
+        emotion_surprise: { name: 'Surprise', description: 'Listen for expressive pitch changes and a sense of surprise.' }
+      }
+    },
+    prosody: {
+      name: 'Prosody',
+      categories: {
+        prosody_focus: { name: 'Focus & stress', description: 'Compare how emphasis brings different words and meanings into focus.' },
+        prosody_question: { name: 'Questions', description: 'Listen for question intonation and the phrasing of interrogative sentences.' },
+        prosody_rhythm: { name: 'Rhythm', description: 'Compare pacing, rhythm, and the flow of connected speech.' },
+        pause_punctuation: { name: 'Punctuation', description: 'Listen to how punctuation shapes pauses and phrase boundaries.' },
+        pause_minimal_pair: { name: 'Pause pairs', description: 'Three matched pairs keep the words unchanged and vary the punctuation. Listen to both versions of each pair.' },
+        natural_conversation: { name: 'Conversation', description: 'Natural conversational turns with everyday phrasing and prosody.' }
+      }
+    }
+  };
   const multilingualSamples = samples.filter(sample => languages[sample.language] && !languages[sample.language].isDialect);
   const dialectSamples = samples.filter(sample => languages[sample.language]?.isDialect);
   const sampleContainer = document.getElementById('audio-samples');
   const dialectContainer = document.getElementById('dialect-samples');
+  const chineseContainer = document.getElementById('chinese-samples');
+  const chineseCategoryList = document.getElementById('chinese-categories');
   const tabs = [...document.querySelectorAll('[data-language]')];
+  const dialectTabs = [...document.querySelectorAll('[data-dialect]')];
+  const chineseTabs = [...document.querySelectorAll('[data-chinese-group]')];
   const playbackGroups = [
     { container: sampleContainer, status: document.getElementById('playback-status') },
-    { container: dialectContainer, status: document.getElementById('dialect-playback-status') }
+    { container: dialectContainer, status: document.getElementById('dialect-playback-status') },
+    { container: chineseContainer, status: document.getElementById('chinese-playback-status') }
   ];
   const toast = document.getElementById('toast');
   let currentLanguage = 'en';
+  let currentDialect = 'zh_sichuan';
+  let currentChineseGroup = 'normal';
+  const chineseSelections = { normal: 'lang_zh', emotion: 'emotion_joy', prosody: 'prosody_focus' };
   let toastTimeout;
 
   function element(tag, className, text) {
@@ -41,8 +81,16 @@
     return svg;
   }
 
+  function sampleNumber(sample) {
+    return sample.display_number || String(sample.selection_rank).padStart(2, '0');
+  }
+
+  function sampleLabel(sample) {
+    return chineseGroups[sample.block]?.categories[sample.category]?.name || languages[sample.language].name;
+  }
+
   function sampleId(sample) {
-    return `sample-${sample.language}-${String(sample.selection_rank).padStart(2, '0')}`;
+    return `sample-${sample.language}-${sampleNumber(sample)}`;
   }
 
   function announce(message) {
@@ -80,8 +128,8 @@
     audio.preload = 'none';
     audio.src = sample.local_audio[model];
     audio.dataset.modelName = modelNames[model];
-    audio.dataset.sampleLabel = `${languages[sample.language].name} / ${String(sample.selection_rank).padStart(2, '0')}`;
-    audio.setAttribute('aria-label', `${modelNames[model]}, ${languages[sample.language].name}, sample ${sample.selection_rank}`);
+    audio.dataset.sampleLabel = `${sampleLabel(sample)} / ${sampleNumber(sample)}`;
+    audio.setAttribute('aria-label', `${modelNames[model]}, ${sampleLabel(sample)}, sample ${sampleNumber(sample)}`);
     audio.textContent = 'Your browser does not support audio playback.';
     audio.addEventListener('play', () => {
       document.querySelectorAll('.sample-card audio').forEach(other => {
@@ -113,13 +161,13 @@
 
   function sampleCard(sample) {
     const language = languages[sample.language];
-    const rank = String(sample.selection_rank).padStart(2, '0');
+    const rank = sampleNumber(sample);
     const card = element('article', 'sample-card');
     card.id = sampleId(sample);
     card.setAttribute('aria-labelledby', `${card.id}-title`);
     const header = element('div', 'sample-card-header');
     const heading = element('div', 'sample-heading');
-    const title = element('h3', '', `${language.name} · Sample ${rank}`);
+    const title = element('h3', '', `${sampleLabel(sample)} · Sample ${rank}`);
     title.id = `${card.id}-title`;
     heading.append(element('span', 'sample-number', rank), title);
     if (sample.language !== 'en') heading.append(element('span', 'native-label', language.native));
@@ -181,49 +229,200 @@
     updatePlaybackStatus();
   }
 
-  tabs.forEach((tab, index) => {
-    tab.addEventListener('click', () => {
-      if (currentLanguage === tab.dataset.language) return;
-      showLanguage(tab.dataset.language);
-      try {
-        history.pushState(null, '', `#examples-${currentLanguage}`);
-      } catch {
-        window.location.hash = `examples-${currentLanguage}`;
-      }
+  function showDialect(dialect) {
+    if (!dialectTabs.some(tab => tab.dataset.dialect === dialect)) return;
+    dialectContainer.querySelectorAll('audio').forEach(audio => audio.pause());
+    currentDialect = dialect;
+    dialectTabs.forEach(tab => {
+      const selected = tab.dataset.dialect === dialect;
+      tab.setAttribute('aria-selected', String(selected));
+      tab.tabIndex = selected ? 0 : -1;
     });
-    tab.addEventListener('keydown', event => {
-      let target;
-      if (event.key === 'ArrowRight') target = (index + 1) % tabs.length;
-      if (event.key === 'ArrowLeft') target = (index - 1 + tabs.length) % tabs.length;
-      if (event.key === 'Home') target = 0;
-      if (event.key === 'End') target = tabs.length - 1;
-      if (target === undefined) return;
-      event.preventDefault();
-      tabs[target].focus();
-      tabs[target].click();
+    const visibleSamples = dialectSamples.filter(sample => dialect === 'all' || sample.language === dialect);
+    dialectContainer.replaceChildren(...visibleSamples.map(sampleCard));
+    if (!visibleSamples.length) {
+      dialectContainer.append(element('p', 'notice', 'Dialect examples are unavailable. Please check that assets/samples.js is included with this page.'));
+    }
+    document.getElementById('dialect-panel').setAttribute('aria-labelledby', `dialect-tab-${dialect}`);
+    document.getElementById('dialect-count').textContent = `${dialect === 'all' ? 'All dialects' : languages[dialect].name} · ${visibleSamples.length} listening examples`;
+    updatePlaybackStatus();
+  }
+
+  function chinesePair(pairId, pairSamples, index) {
+    const group = element('section', 'minimal-pair-group');
+    group.id = `chinese-${pairId}`;
+    group.dataset.pair = pairId;
+    group.setAttribute('aria-labelledby', `${group.id}-title`);
+    const header = element('div', 'minimal-pair-header');
+    const title = element('h3', '', `Pause pair ${String(index + 1).padStart(2, '0')}`);
+    title.id = `${group.id}-title`;
+    header.append(icon('link'), title, element('span', '', 'Same words · Different punctuation'));
+    const comparison = element('div', 'pair-text-comparison');
+    pairSamples.forEach((sample, variant) => {
+      const version = element('div', 'pair-text-version');
+      const text = element('p', '', sample.target);
+      text.lang = 'zh-CN';
+      version.append(element('span', '', `${String.fromCharCode(65 + variant)} · ${sampleNumber(sample)}`), text);
+      comparison.append(version);
     });
+    group.append(header, comparison);
+    pairSamples.forEach((sample, variant) => {
+      const card = sampleCard(sample);
+      card.querySelector('.sample-heading').append(element('span', 'pair-variant', `Version ${String.fromCharCode(65 + variant)}`));
+      group.append(card);
+    });
+    return group;
+  }
+
+  function showChinese(block, category) {
+    const group = chineseGroups[block];
+    if (!group) return false;
+    const selectedCategory = category || chineseSelections[block];
+    if (!Object.hasOwn(group.categories, selectedCategory)) return false;
+    chineseContainer.querySelectorAll('audio').forEach(audio => audio.pause());
+    currentChineseGroup = block;
+    chineseSelections[block] = selectedCategory;
+    chineseTabs.forEach(tab => {
+      const selected = tab.dataset.chineseGroup === block;
+      tab.setAttribute('aria-selected', String(selected));
+      tab.tabIndex = selected ? 0 : -1;
+    });
+    const groupPanel = document.getElementById('chinese-group-panel');
+    groupPanel.setAttribute('aria-labelledby', `chinese-group-${block}`);
+    groupPanel.dataset.collection = block;
+    if (chineseCategoryList.dataset.collection !== block) {
+      const categoryTabs = Object.entries(group.categories).map(([key, info]) => {
+        const button = element('button', 'chinese-category-tab');
+        button.type = 'button';
+        button.id = `chinese-category-${key}`;
+        button.dataset.chineseCategory = key;
+        button.setAttribute('role', 'tab');
+        button.setAttribute('aria-controls', 'chinese-panel');
+        const count = chineseSamples.filter(sample => sample.block === block && sample.category === key).length;
+        button.append(document.createTextNode(info.name), element('span', '', String(count).padStart(2, '0')));
+        return button;
+      });
+      chineseCategoryList.replaceChildren(...categoryTabs);
+      chineseCategoryList.dataset.collection = block;
+      chineseCategoryList.setAttribute('aria-label', `Choose a category within ${group.name}`);
+      bindTabs(categoryTabs, tab => {
+        if (chineseSelections[block] === tab.dataset.chineseCategory) return;
+        selectChinese(block, tab.dataset.chineseCategory);
+      });
+    }
+    chineseCategoryList.querySelectorAll('[role="tab"]').forEach(tab => {
+      const selected = tab.dataset.chineseCategory === selectedCategory;
+      tab.setAttribute('aria-selected', String(selected));
+      tab.tabIndex = selected ? 0 : -1;
+    });
+    const info = group.categories[selectedCategory];
+    document.getElementById('chinese-panel').setAttribute('aria-labelledby', `chinese-category-${selectedCategory}`);
+    document.getElementById('chinese-breadcrumb').replaceChildren(
+      document.createTextNode('Chinese'), element('span', '', '/'), document.createTextNode(group.name),
+      element('span', '', '/'), element('strong', '', info.name)
+    );
+    document.getElementById('chinese-description').textContent = info.description;
+    const visibleSamples = chineseSamples.filter(sample => sample.block === block && sample.category === selectedCategory)
+      .sort((a, b) => a.selection_rank - b.selection_rank);
+    if (selectedCategory === 'pause_minimal_pair') {
+      const pairs = new Map();
+      visibleSamples.forEach(sample => {
+        if (!pairs.has(sample.minimal_pair)) pairs.set(sample.minimal_pair, []);
+        pairs.get(sample.minimal_pair).push(sample);
+      });
+      chineseContainer.replaceChildren(...[...pairs].map(([key, pairSamples], index) => chinesePair(key, pairSamples, index)));
+      document.getElementById('chinese-count').textContent = `${info.name} · ${pairs.size} pairs · ${visibleSamples.length} listening examples`;
+    } else {
+      chineseContainer.replaceChildren(...visibleSamples.map(sampleCard));
+      document.getElementById('chinese-count').textContent = `${info.name} · ${visibleSamples.length} listening examples`;
+    }
+    if (!visibleSamples.length) {
+      chineseContainer.append(element('p', 'notice', 'Chinese examples are unavailable. Please check that assets/chinese-samples.js is included with this page.'));
+    }
+    updatePlaybackStatus();
+    return true;
+  }
+
+  function selectChinese(block, category) {
+    if (!showChinese(block, category)) return;
+    const hash = `chinese-${block}-${chineseSelections[block]}`;
+    try {
+      history.pushState(null, '', `#${hash}`);
+    } catch {
+      window.location.hash = hash;
+    }
+  }
+
+  function bindTabs(group, selectTab) {
+    group.forEach((tab, index) => {
+      tab.addEventListener('click', () => selectTab(tab));
+      tab.addEventListener('keydown', event => {
+        let target;
+        if (event.key === 'ArrowRight') target = (index + 1) % group.length;
+        if (event.key === 'ArrowLeft') target = (index - 1 + group.length) % group.length;
+        if (event.key === 'Home') target = 0;
+        if (event.key === 'End') target = group.length - 1;
+        if (target === undefined) return;
+        event.preventDefault();
+        group[target].focus();
+        group[target].click();
+      });
+    });
+  }
+
+  bindTabs(tabs, tab => {
+    if (currentLanguage === tab.dataset.language) return;
+    showLanguage(tab.dataset.language);
+    try {
+      history.pushState(null, '', `#examples-${currentLanguage}`);
+    } catch {
+      window.location.hash = `examples-${currentLanguage}`;
+    }
+  });
+  bindTabs(dialectTabs, tab => {
+    if (currentDialect === tab.dataset.dialect) return;
+    showDialect(tab.dataset.dialect);
+    try {
+      history.pushState(null, '', `#dialects-${currentDialect}`);
+    } catch {
+      window.location.hash = `dialects-${currentDialect}`;
+    }
+  });
+
+  bindTabs(chineseTabs, tab => {
+    if (currentChineseGroup !== tab.dataset.chineseGroup) selectChinese(tab.dataset.chineseGroup);
   });
 
   function routeHash(shouldScroll) {
     const hash = window.location.hash.slice(1);
     const languageMatch = /^examples-(en|de|fr|ja|ko|all)$/.exec(hash);
-    const sample = samples.find(item => sampleId(item) === hash);
-    if (hash === 'examples-zh_sichuan') {
+    const dialectMatch = /^dialects-(zh_sichuan|yue|all)$/.exec(hash) || /^examples-(zh_sichuan|yue)$/.exec(hash);
+    const chineseMatch = /^chinese-(normal|emotion|prosody)(?:-([a-z_]+))?$/.exec(hash);
+    const sample = [...samples, ...chineseSamples].find(item => sampleId(item) === hash);
+    if (chineseMatch) {
+      if (showChinese(chineseMatch[1], chineseMatch[2]) && shouldScroll) {
+        requestAnimationFrame(() => document.getElementById('chinese-examples').scrollIntoView());
+      }
+    } else if (dialectMatch) {
+      if (currentDialect !== dialectMatch[1]) showDialect(dialectMatch[1]);
       if (shouldScroll) requestAnimationFrame(() => document.getElementById('dialect-examples').scrollIntoView());
     } else if (languageMatch) {
       if (currentLanguage !== languageMatch[1]) showLanguage(languageMatch[1]);
       if (shouldScroll) requestAnimationFrame(() => document.getElementById('examples').scrollIntoView());
     } else if (sample) {
-      if (!languages[sample.language].isDialect && currentLanguage !== sample.language && currentLanguage !== 'all') showLanguage(sample.language);
+      if (sample.block && chineseGroups[sample.block]) {
+        if (currentChineseGroup !== sample.block || chineseSelections[sample.block] !== sample.category) showChinese(sample.block, sample.category);
+      } else if (languages[sample.language]?.isDialect) {
+        if (currentDialect !== sample.language && currentDialect !== 'all') showDialect(sample.language);
+      } else if (currentLanguage !== sample.language && currentLanguage !== 'all') {
+        showLanguage(sample.language);
+      }
       if (shouldScroll) requestAnimationFrame(() => document.getElementById(hash)?.scrollIntoView());
     }
   }
 
-  dialectContainer.replaceChildren(...dialectSamples.map(sampleCard));
-  document.getElementById('dialect-count').textContent = `Sichuanese · ${dialectSamples.length} listening examples`;
-  if (!dialectSamples.length) {
-    dialectContainer.append(element('p', 'notice', 'Dialect examples are unavailable. Please check that assets/samples.js is included with this page.'));
-  }
+  showChinese('normal');
+  showDialect('zh_sichuan');
   showLanguage('en');
   routeHash(true);
   window.addEventListener('hashchange', () => routeHash(true));
@@ -249,7 +448,7 @@
 
   const backToTop = document.querySelector('.back-to-top');
   const navLinks = [...document.querySelectorAll('.top-nav a')];
-  const anchors = ['abstract', 'tokenizer', 'architecture', 'examples', 'dialect-examples']
+  const anchors = ['abstract', 'tokenizer', 'architecture', 'chinese-examples', 'examples', 'dialect-examples']
     .map(id => document.getElementById(id))
     .filter(Boolean);
   let scrollPending = false;

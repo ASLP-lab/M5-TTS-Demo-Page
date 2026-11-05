@@ -464,5 +464,69 @@ window.M5_SAMPLES = [
     "m5": {
       "duration": 6.3
     }
+  },
+  {
+    "utt": "m5tts__dialect_yue__yue_to_yue__006",
+    "language": "yue",
+    "target": "你唔使咁紧张，慢慢讲就得㗎喇。大家都喺度听，冇人会催你嘅。",
+    "selection_rank": 1,
+    "flags": [],
+    "local_audio": {
+      "reference": "yue/m5tts__dialect_yue__yue_to_yue__006/reference.wav",
+      "m5": "yue/m5tts__dialect_yue__yue_to_yue__006/m5.wav"
+    },
+    "prompt_text": "這些是有時擁擠的家庭海灘，岸邊有成排的商店林立。在這裡游泳很安全。",
+    "reference_duration": 8.52,
+    "m5": {
+      "duration": 6.196875
+    }
+  },
+  {
+    "utt": "m5tts__dialect_yue__yue_to_yue__007",
+    "language": "yue",
+    "target": "件衫几靓喎，不过个袖口有啲窄。唔知可唔可以攞大一个码畀我试下呢？",
+    "selection_rank": 2,
+    "flags": [],
+    "local_audio": {
+      "reference": "yue/m5tts__dialect_yue__yue_to_yue__007/reference.wav",
+      "m5": "yue/m5tts__dialect_yue__yue_to_yue__007/m5.wav"
+    },
+    "prompt_text": "多數較小的島嶼皆為獨立國家，或與法國有著淵源，且以奢華海濱度假村聞名。",
+    "reference_duration": 10.32,
+    "m5": {
+      "duration": 6.516875
+    }
+  },
+  {
+    "utt": "m5tts__dialect_yue__yue_to_yue__008",
+    "language": "yue",
+    "target": "佢话自己唔识煮餸，点知一入厨房，切菜炒饭样样都掂，真系睇唔出喎。",
+    "selection_rank": 3,
+    "flags": [],
+    "local_audio": {
+      "reference": "yue/m5tts__dialect_yue__yue_to_yue__008/reference.wav",
+      "m5": "yue/m5tts__dialect_yue__yue_to_yue__008/m5.wav"
+    },
+    "prompt_text": "更北方的大片地區人口稀少，有些幾乎是杳無人煙的荒野。",
+    "reference_duration": 7.14,
+    "m5": {
+      "duration": 8.46
+    }
+  },
+  {
+    "utt": "m5tts__dialect_yue__yue_to_yue__009",
+    "language": "yue",
+    "target": "细个嗰阵，我哋成日喺楼下玩捉迷藏。阿妈一叫食饭，大家就即刻跑返屋企。",
+    "selection_rank": 4,
+    "flags": [],
+    "local_audio": {
+      "reference": "yue/m5tts__dialect_yue__yue_to_yue__009/reference.wav",
+      "m5": "yue/m5tts__dialect_yue__yue_to_yue__009/m5.wav"
+    },
+    "prompt_text_status": "not_displayed",
+    "reference_duration": 9.0,
+    "m5": {
+      "duration": 7.1
+    }
   }
 ];

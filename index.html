@@ -4,11 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#6554cf">
-  <meta name="description" content="M5-TTS: a 50M-parameter multilingual and multi-dialect text-to-speech language model with multi-token prediction. Explore the architecture and listen to multilingual and Sichuanese voice-cloning examples.">
+  <meta name="description" content="M5-TTS: a 50M-parameter multilingual and multi-dialect text-to-speech language model with multi-token prediction. Explore the architecture and listen to Chinese everyday speech, emotion and prosody, alongside multilingual, Sichuanese, and Cantonese examples.">
   <title>M5-TTS · Multilingual Text-to-Speech Demo</title>
   <link rel="icon" type="image/png" href="assets/m5-tts-logo.png">
   <link rel="stylesheet" href="assets/styles.css">
   <script src="assets/samples.js" defer></script>
+  <script src="assets/chinese-samples.js" defer></script>
   <script src="assets/app.js" defer></script>
 </head>
 <body>
@@ -36,6 +37,7 @@
       <nav class="top-nav" aria-label="Main navigation">
         <a href="#abstract">Overview</a>
         <a href="#tokenizer">Architecture</a>
+        <a href="#chinese-examples">Chinese</a>
         <a href="#examples">Multilingual</a>
         <a href="#dialect-examples">Dialects</a>
       </nav>
@@ -96,8 +98,9 @@
           <a href="#abstract"><span>01</span><div>Abstract<small>Research overview</small></div><svg class="icon"><use href="#icon-arrow"/></svg></a>
           <a href="#tokenizer"><span>02</span><div>Speech tokenizer<small>A compact representation</small></div><svg class="icon"><use href="#icon-arrow"/></svg></a>
           <a href="#architecture"><span>03</span><div>Model architecture<small>Backbone + multi-token prediction</small></div><svg class="icon"><use href="#icon-arrow"/></svg></a>
-          <a href="#examples"><span>04</span><div>Multilingual examples<small>5 languages · 20 samples</small></div><svg class="icon"><use href="#icon-arrow"/></svg></a>
-          <a href="#dialect-examples"><span>05</span><div>Dialect examples<small>Sichuanese · 4 samples</small></div><svg class="icon"><use href="#icon-arrow"/></svg></a>
+          <a href="#chinese-examples"><span>04</span><div>Chinese examples<small>Everyday speech, emotion &amp; prosody · 50 samples</small></div><svg class="icon"><use href="#icon-arrow"/></svg></a>
+          <a href="#examples"><span>05</span><div>Multilingual examples<small>5 languages · 20 samples</small></div><svg class="icon"><use href="#icon-arrow"/></svg></a>
+          <a href="#dialect-examples"><span>06</span><div>Dialect examples<small>Sichuanese &amp; Cantonese · 8 samples</small></div><svg class="icon"><use href="#icon-arrow"/></svg></a>
         </div>
         <div class="contents-languages"><span>Jump to a language</span><a href="#examples-en">English</a><a href="#examples-de">German</a><a href="#examples-fr">French</a><a href="#examples-ja">Japanese</a><a href="#examples-ko">Korean</a></div>
       </nav>
@@ -124,8 +127,30 @@
         <div class="architecture-note"><svg class="icon"><use href="#icon-model"/></svg><p><strong>One frame, sixteen tokens.</strong> The backbone retains its attention cache across frames; the MTP cache resets for each new frame. This separates temporal modeling from within-frame acoustic refinement without expanding all 16 codebooks into separate backbone time steps.</p></div>
       </section>
 
+      <section class="section examples-section chinese-section" id="chinese-examples" aria-labelledby="chinese-title">
+        <div class="section-heading"><div><span class="section-kicker">ONE LANGUAGE, MANY WAYS TO SPEAK</span><h2 id="chinese-title">Chinese examples</h2></div><span class="section-number" aria-hidden="true">04</span></div>
+        <p class="section-intro">Explore Chinese speech through everyday delivery, emotion, and prosody. Choose a collection, then a listening category to compare <strong>M5-TTS</strong> and <strong>MOSS-TTS-Nano</strong> with the same reference prompt and target text.</p>
+        <div class="chinese-overview"><span><svg class="icon small"><use href="#icon-headphones"/></svg> A guided listening collection</span><span>3 collections <i>·</i> 12 categories <i>·</i> 50 examples</span></div>
+        <div class="chinese-group-tabs" role="tablist" aria-label="Choose a Chinese speech collection">
+          <button type="button" class="chinese-group-card" id="chinese-group-normal" role="tab" aria-selected="true" aria-controls="chinese-group-panel" data-chinese-group="normal"><span class="collection-top"><span class="collection-icon"><svg class="icon"><use href="#icon-paper"/></svg></span><span class="collection-index">01</span></span><span class="collection-title">Everyday speech</span><span class="collection-description">Mandarin &amp; code-switching</span><span class="collection-meta">2 categories <span>8 examples</span></span></button>
+          <button type="button" class="chinese-group-card" id="chinese-group-emotion" role="tab" aria-selected="false" aria-controls="chinese-group-panel" tabindex="-1" data-chinese-group="emotion"><span class="collection-top"><span class="collection-icon"><svg class="icon"><use href="#icon-headphones"/></svg></span><span class="collection-index">02</span></span><span class="collection-title">Emotion</span><span class="collection-description">Joy, sadness, anger &amp; surprise</span><span class="collection-meta">4 categories <span>16 examples</span></span></button>
+          <button type="button" class="chinese-group-card" id="chinese-group-prosody" role="tab" aria-selected="false" aria-controls="chinese-group-panel" tabindex="-1" data-chinese-group="prosody"><span class="collection-top"><span class="collection-icon"><svg class="icon"><use href="#icon-model"/></svg></span><span class="collection-index">03</span></span><span class="collection-title">Prosody</span><span class="collection-description">Focus, rhythm, pauses &amp; conversation</span><span class="collection-meta">6 categories <span>26 examples</span></span></button>
+        </div>
+        <div id="chinese-group-panel" class="chinese-group-panel" role="tabpanel" aria-labelledby="chinese-group-normal" data-collection="normal">
+          <div class="chinese-category-header"><span class="category-step">02</span><span>Choose a listening category</span></div>
+          <div id="chinese-categories" class="chinese-category-tabs" role="tablist" aria-label="Choose a category within Everyday speech"></div>
+          <div id="chinese-panel" role="tabpanel" aria-labelledby="chinese-category-lang_zh" tabindex="0">
+            <div class="chinese-context"><p id="chinese-breadcrumb" class="chinese-breadcrumb">Chinese <span>/</span> Everyday speech <span>/</span> Mandarin</p><p id="chinese-description">Everyday Chinese sentences and natural spoken phrasing.</p></div>
+            <div class="examples-toolbar"><p id="chinese-count" role="status">Mandarin · 4 listening examples</p><span id="chinese-playback-status" class="playback-status" aria-live="polite"><span class="idle-dot"></span> Ready to listen</span></div>
+            <div id="chinese-samples"></div>
+          </div>
+        </div>
+        <noscript><p class="notice">Enable JavaScript to explore all 50 Chinese examples. You can open the first <a href="chinese/normal/lang_zh/002/m5.wav">M5-TTS output</a>, <a href="chinese/normal/lang_zh/002/moss.wav">MOSS-TTS-Nano output</a>, and <a href="chinese/normal/lang_zh/002/reference.wav">reference prompt</a> directly.</p></noscript>
+        <p class="chinese-footnote">Curated listening examples, not an unbiased benchmark. Original sample IDs, target punctuation, and reference transcripts are preserved.</p>
+      </section>
+
       <section class="section examples-section" id="examples" aria-labelledby="examples-title">
-        <div class="section-heading"><div><span class="section-kicker">LISTEN ACROSS LANGUAGES</span><h2 id="examples-title">Multilingual examples</h2></div><span class="section-number" aria-hidden="true">04</span></div>
+        <div class="section-heading"><div><span class="section-kicker">LISTEN ACROSS LANGUAGES</span><h2 id="examples-title">Multilingual examples</h2></div><span class="section-number" aria-hidden="true">05</span></div>
         <p class="section-intro">Compare <strong>M5-TTS</strong> with <strong>MOSS-TTS-Nano</strong> across English, German, French, Japanese, and Korean, using the same reference voice and target text.</p>
         <div class="listening-banner"><svg class="icon"><use href="#icon-headphones"/></svg><p>Headphones recommended<span>Read the prompt and target texts, then listen to the reference and generated speech.</span></p><span class="sample-total">5 languages <span>·</span> 20 samples</span></div>
         <div class="language-tabs" role="tablist" aria-label="Choose an example language">
@@ -143,12 +168,17 @@
       </section>
 
       <section class="section examples-section" id="dialect-examples" aria-labelledby="dialect-title">
-        <div class="section-heading"><div><span class="section-kicker">LISTEN TO REGIONAL VOICES</span><h2 id="dialect-title">Dialect examples</h2></div><span class="section-number" aria-hidden="true">05</span></div>
-        <p class="section-intro">Explore <strong>Sichuanese</strong> speech synthesis with M5-TTS. Each example includes a reference voice prompt, its transcript, the target text, and the generated speech. Baseline audio is not provided for these dialect samples.</p>
-        <div class="listening-banner"><svg class="icon"><use href="#icon-headphones"/></svg><p>Sichuanese<span>Listen to the reference prompt, then the M5-TTS output.</span></p><span class="sample-total">1 dialect <span>·</span> 4 samples</span></div>
+        <div class="section-heading"><div><span class="section-kicker">LISTEN TO REGIONAL VOICES</span><h2 id="dialect-title">Dialect examples</h2></div><span class="section-number" aria-hidden="true">06</span></div>
+        <p class="section-intro">Explore <strong>Sichuanese</strong> and <strong>Cantonese</strong> speech synthesis with M5-TTS. Each example includes a reference voice prompt, the target text, and the generated speech, with reference transcripts shown where available. Baseline audio is not provided for these dialect samples.</p>
+        <div class="listening-banner"><svg class="icon"><use href="#icon-headphones"/></svg><p>Regional voices<span>Listen to the reference prompt, then the M5-TTS output.</span></p><span class="sample-total">2 dialects <span>·</span> 8 samples</span></div>
+        <div class="language-tabs" role="tablist" aria-label="Choose an example dialect">
+          <button type="button" id="dialect-tab-zh_sichuan" role="tab" aria-selected="true" aria-controls="dialect-panel" data-dialect="zh_sichuan"><span class="language-code">SC</span> Sichuanese <span class="tab-count">04</span></button>
+          <button type="button" id="dialect-tab-yue" role="tab" aria-selected="false" aria-controls="dialect-panel" tabindex="-1" data-dialect="yue"><span class="language-code">YUE</span> Cantonese <span class="tab-count">04</span></button>
+          <button type="button" id="dialect-tab-all" role="tab" aria-selected="false" aria-controls="dialect-panel" tabindex="-1" data-dialect="all">All dialects <span class="tab-count">08</span></button>
+        </div>
         <div class="examples-toolbar"><p id="dialect-count" role="status">Sichuanese · 4 listening examples</p><span id="dialect-playback-status" class="playback-status" aria-live="polite"><span class="idle-dot"></span> Ready to listen</span></div>
-        <div id="dialect-samples"></div>
-        <noscript><p class="notice">Enable JavaScript to browse the four Sichuanese examples. You can still open the <a href="chuan/m5tts__dialect_sichuan__zh_sichuan_to_zh_sichuan__001/m5.wav">first M5-TTS sample</a> and its <a href="chuan/m5tts__dialect_sichuan__zh_sichuan_to_zh_sichuan__001/reference.wav">reference prompt</a> directly.</p></noscript>
+        <div id="dialect-panel" role="tabpanel" aria-labelledby="dialect-tab-zh_sichuan" tabindex="0"><div id="dialect-samples"></div></div>
+        <noscript><p class="notice">Enable JavaScript to browse all eight dialect examples. You can still open the first <a href="chuan/m5tts__dialect_sichuan__zh_sichuan_to_zh_sichuan__001/m5.wav">Sichuanese output</a> and <a href="chuan/m5tts__dialect_sichuan__zh_sichuan_to_zh_sichuan__001/reference.wav">reference prompt</a>, or the first <a href="yue/m5tts__dialect_yue__yue_to_yue__006/m5.wav">Cantonese output</a> and <a href="yue/m5tts__dialect_yue__yue_to_yue__006/reference.wav">reference prompt</a> directly.</p></noscript>
       </section>
 
     </div>
