@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#6554cf">
+  <meta name="theme-color" content="#ffffff">
   <meta name="description" content="M5-TTS: a 50M-parameter multilingual and multi-dialect text-to-speech language model with multi-token prediction. Explore the architecture and listen to Chinese everyday speech, emotion and prosody, alongside multilingual, Sichuanese, and Cantonese examples.">
   <title>M5-TTS · Multilingual Text-to-Speech Demo</title>
   <link rel="icon" type="image/png" href="assets/m5-tts-logo.png">
@@ -47,7 +47,7 @@
     <section class="hero" id="top" aria-labelledby="paper-title">
       <div class="hero-glow" aria-hidden="true"></div>
       <div class="hero-content">
-        <div class="eyebrow"><span class="status-dot"></span> ASLP LAB <span class="eyebrow-separator">/</span> TECHNICAL REPORT V2 <span class="report-date">NOV 2026</span></div>
+        <div class="eyebrow"><span class="status-dot"></span> ASLP LAB <span class="eyebrow-separator">/</span> TECHNICAL REPORT V3 <span class="report-date">NOV 2026</span></div>
         <img class="hero-logo" src="assets/m5-tts-logo.png" alt="M5-TTS hummingbird logo from the technical report" width="200" height="144" fetchpriority="high">
         <h1 id="paper-title"><span class="project-name">M5-TTS</span><span class="paper-subtitle">A Mini-Scale Multilingual and Multi-Dialect<br class="desktop-break"> Text-to-Speech Language Model<br class="desktop-break"> with Multi-Token Prediction</span></h1>
         <div class="authors">
@@ -87,7 +87,7 @@
       <section class="section abstract-section" id="abstract" aria-labelledby="abstract-title">
         <div class="section-heading"><div><span class="section-kicker">THE RESEARCH</span><h2 id="abstract-title">Abstract</h2></div><span class="section-number" aria-hidden="true">01</span></div>
         <div class="abstract-copy">
-          <p>We present <strong>M5-TTS</strong>, a compact text-to-speech system supporting multilingual and Chinese multidialect synthesis, zero-shot voice cloning, speaker-specific multilingual generation, and CPU streaming. Its <strong>50M-parameter language model</strong>, excluding the speech codec, combines a temporal backbone with a local multi-token prediction module over 16 codebooks. GRPO post-training combines global speaker-similarity and pause feedback with a <strong>token-level CER process advantage</strong>. Character-level error comparisons provide local feedback, with negative credit propagated backward within a clause and projected onto audio-token positions.</p>
+          <p>We present <strong>M5-TTS</strong>, a compact text-to-speech system supporting multilingual and Chinese multi-dialect synthesis, zero-shot voice cloning, speaker-specific multilingual generation, and CPU streaming. Its <strong>50M-parameter language model</strong>, excluding the speech codec, combines a temporal backbone with a local multi-token prediction module over 16 codebooks. GRPO post-training combines global speaker-similarity and pause feedback with a <strong>token-level CER process advantage</strong>. Character-level error comparisons provide local feedback, with negative credit propagated backward within a clause and projected onto audio-token positions.</p>
           <p>M5-TTS achieves <strong>1.37% CER</strong> on Seed-ZH and <strong>2.91% WER</strong> on Seed-EN, corresponding to relative error reductions of <strong>62.2%</strong> and <strong>35.3%</strong> over MOSS-TTS-Nano with half the language-model parameters. It also achieves lower content error rates in five of six evaluated MiniMax languages, while difficult Chinese inputs remain a limitation. On four Intel Xeon Gold 6530 cores, it achieves a real-time factor of <strong>0.653</strong> and a warm first-chunk latency of <strong>225 ms</strong>. A 10-listener evaluation gives M5-TTS higher speaker-similarity and intelligibility ratings than MOSS-TTS-Nano, with a lower naturalness rating. We will release training, post-training, and inference code, together with voice-cloning and speaker-specific checkpoints, to support reproducible research on compact speech generation for on-device voice interaction.</p>
         </div>
       </section>
@@ -122,7 +122,7 @@
         <figure class="figure-card">
           <div class="figure-topline"><span><span class="figure-dot cyan"></span> M5-TTS · 50M language-model parameters</span><button class="text-button" type="button" data-zoom="assets/architecture.png" data-caption="Figure 2. M5-TTS architecture: temporal backbone and local MTP module." aria-label="Expand model architecture diagram">Expand figure <svg class="icon small"><use href="#icon-expand"/></svg></button></div>
           <button class="figure-image-button model-image" type="button" data-zoom="assets/architecture.png" data-caption="Figure 2. M5-TTS architecture: temporal backbone and local MTP module." aria-label="View full-size model architecture diagram"><img src="assets/architecture.png" alt="M5-TTS architecture: accent and language IDs precede the text; speaker ID is used in speaker-specific fine-tuning. The backbone Transformer predicts codebook 0, then the local MTP module generates codebooks 1 through 15. The codec decoder reconstructs the waveform." width="1590" height="989" loading="lazy"></button>
-          <figcaption><span>Figure 2</span> The temporal backbone predicts codebook 0; the local MTP module generates codebooks 1–15 within each frame, which are then decoded into speech. Original figure from technical report v2.</figcaption>
+          <figcaption><span>Figure 2</span> The temporal backbone predicts codebook 0; the local MTP module generates codebooks 1–15 within each frame, which are then decoded into speech. Original figure from technical report v3.</figcaption>
         </figure>
         <div class="architecture-note"><svg class="icon"><use href="#icon-model"/></svg><p><strong>One frame, sixteen tokens.</strong> The backbone retains its attention cache across frames; the MTP cache resets for each new frame. This separates temporal modeling from within-frame acoustic refinement without expanding all 16 codebooks into separate backbone time steps.</p></div>
       </section>
@@ -146,7 +146,7 @@
           </div>
         </div>
         <noscript><p class="notice">Enable JavaScript to explore all 50 Chinese examples. You can open the first <a href="chinese/normal/lang_zh/002/m5.wav">M5-TTS output</a>, <a href="chinese/normal/lang_zh/002/moss.wav">MOSS-TTS-Nano output</a>, and <a href="chinese/normal/lang_zh/002/reference.wav">reference prompt</a> directly.</p></noscript>
-        <p class="chinese-footnote">Curated listening examples, not an unbiased benchmark. Original sample IDs, target punctuation, and reference transcripts are preserved.</p>
+        <p class="chinese-footnote">Curated listening examples, not an unbiased benchmark. Target punctuation and reference transcripts are preserved.</p>
       </section>
 
       <section class="section examples-section" id="examples" aria-labelledby="examples-title">
@@ -183,7 +183,7 @@
 
     </div>
   </main>
-  <footer class="site-footer"><div><a class="footer-brand" href="#top">M5-TTS<span>A small model. A multilingual voice.</span></a><p>ASLP Lab · November 2026<br><span>Demo layout inspired by <a href="https://hujingbin1.github.io/OmniCodec-Demo-Page/" target="_blank" rel="noopener noreferrer">OmniCodec</a>.</span></p></div></footer>
+  <footer class="site-footer"><div><a class="footer-brand" href="#top">M5-TTS<span>A small model. A multilingual voice.</span></a><p>ASLP Lab · November 2026</p></div></footer>
   <a href="#top" class="back-to-top" aria-label="Back to top"><svg class="icon"><use href="#icon-up"/></svg></a>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <dialog id="figure-dialog" aria-labelledby="dialog-caption"><div class="dialog-topline"><p id="dialog-caption"></p><button class="icon-button" id="close-figure" type="button" aria-label="Close expanded figure"><svg class="icon"><use href="#icon-close"/></svg></button></div><img id="expanded-figure" alt=""><a id="original-figure" class="text-button" target="_blank" rel="noopener">Open original image <svg class="icon small"><use href="#icon-arrow"/></svg></a></dialog>

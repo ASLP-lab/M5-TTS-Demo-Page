@@ -113,7 +113,7 @@
     });
   }
 
-  function audioCell(sample, model) {
+  function audioCell(sample, model, displayIndex) {
     const cell = element('div', `audio-cell${model === 'm5' ? ' ours' : ''}`);
     const header = element('div', 'audio-cell-heading');
     const name = element('h4', '', modelNames[model]);
@@ -128,8 +128,8 @@
     audio.preload = 'none';
     audio.src = sample.local_audio[model];
     audio.dataset.modelName = modelNames[model];
-    audio.dataset.sampleLabel = `${sampleLabel(sample)} / ${sampleNumber(sample)}`;
-    audio.setAttribute('aria-label', `${modelNames[model]}, ${sampleLabel(sample)}, sample ${sampleNumber(sample)}`);
+    audio.dataset.sampleLabel = `${sampleLabel(sample)} / Sample ${displayIndex}`;
+    audio.setAttribute('aria-label', `${modelNames[model]}, ${sampleLabel(sample)}, sample ${displayIndex}`);
     audio.textContent = 'Your browser does not support audio playback.';
     audio.addEventListener('play', () => {
       document.querySelectorAll('.sample-card audio').forEach(other => {
@@ -159,15 +159,15 @@
     return cell;
   }
 
-  function sampleCard(sample) {
+  function sampleCard(sample, displayIndex) {
     const language = languages[sample.language];
-    const rank = sampleNumber(sample);
+    const rank = String(displayIndex);
     const card = element('article', 'sample-card');
     card.id = sampleId(sample);
     card.setAttribute('aria-labelledby', `${card.id}-title`);
     const header = element('div', 'sample-card-header');
     const heading = element('div', 'sample-heading');
-    const title = element('h3', '', `${sampleLabel(sample)} · Sample ${rank}`);
+    const title = element('h3', '', `Sample ${rank}`);
     title.id = `${card.id}-title`;
     heading.append(element('span', 'sample-number', rank), title);
     if (sample.language !== 'en') heading.append(element('span', 'native-label', language.native));
@@ -192,17 +192,17 @@
     const target = element('div', 'target-text');
     const text = element('p', '', sample.target);
     text.lang = language.textLang || sample.language;
-    target.append(element('span', 'target-label', 'TARGET TEXT'), text);
+    target.append(element('span', 'target-label', 'Target text'), text);
     const audioColumns = element('div', 'audio-columns');
     const availableModels = ['reference', 'm5', 'moss'].filter(model => sample.local_audio[model]);
     audioColumns.style.setProperty('--audio-column-count', availableModels.length);
-    for (const model of availableModels) audioColumns.append(audioCell(sample, model));
+    for (const model of availableModels) audioColumns.append(audioCell(sample, model, displayIndex));
     const prompt = element('div', 'target-text prompt-text');
     const promptText = typeof sample.prompt_text === 'string' ? sample.prompt_text.trim() : '';
     const missingTranscript = sample.prompt_text_status === 'not_displayed' ? 'Reference transcript not displayed.' : 'Reference transcript not provided.';
     const transcript = element('p', promptText ? '' : 'transcript-missing', promptText || missingTranscript);
     transcript.lang = promptText ? language.textLang || sample.language : 'en';
-    prompt.append(element('span', 'target-label', 'PROMPT TEXT · REFERENCE AUDIO'), transcript);
+    prompt.append(element('span', 'target-label', 'Prompt text'), transcript);
     card.append(header, prompt, target, audioColumns);
     if (sample.flags.includes('时长相差超过2倍')) {
       card.append(element('p', 'sample-warning', 'Listening note: the two generated clips differ in duration by more than 2×.'));
@@ -248,13 +248,13 @@
     updatePlaybackStatus();
   }
 
-  function chinesePair(pairId, pairSamples, index) {
+  function chinesePair(pairId, pairSamples, index, startIndex) {
     const group = element('section', 'minimal-pair-group');
     group.id = `chinese-${pairId}`;
     group.dataset.pair = pairId;
     group.setAttribute('aria-labelledby', `${group.id}-title`);
     const header = element('div', 'minimal-pair-header');
-    const title = element('h3', '', `Pause pair ${String(index + 1).padStart(2, '0')}`);
+    const title = element('h3', '', `Pause pair ${index}`);
     title.id = `${group.id}-title`;
     header.append(icon('link'), title, element('span', '', 'Same words · Different punctuation'));
     const comparison = element('div', 'pair-text-comparison');
@@ -262,12 +262,12 @@
       const version = element('div', 'pair-text-version');
       const text = element('p', '', sample.target);
       text.lang = 'zh-CN';
-      version.append(element('span', '', `${String.fromCharCode(65 + variant)} · ${sampleNumber(sample)}`), text);
+      version.append(element('span', '', `${String.fromCharCode(65 + variant)} · Sample ${startIndex + variant}`), text);
       comparison.append(version);
     });
     group.append(header, comparison);
     pairSamples.forEach((sample, variant) => {
-      const card = sampleCard(sample);
+      const card = sampleCard(sample, startIndex + variant);
       card.querySelector('.sample-heading').append(element('span', 'pair-variant', `Version ${String.fromCharCode(65 + variant)}`));
       group.append(card);
     });
@@ -330,7 +330,7 @@
         if (!pairs.has(sample.minimal_pair)) pairs.set(sample.minimal_pair, []);
         pairs.get(sample.minimal_pair).push(sample);
       });
-      chineseContainer.replaceChildren(...[...pairs].map(([key, pairSamples], index) => chinesePair(key, pairSamples, index)));
+      chineseContainer.replaceChildren(...[...pairs].map(([key, pairSamples], index) => chinesePair(key, pairSamples, index, visibleSamples.indexOf(pairSamples[0]))));
       document.getElementById('chinese-count').textContent = `${info.name} · ${pairs.size} pairs · ${visibleSamples.length} listening examples`;
     } else {
       chineseContainer.replaceChildren(...visibleSamples.map(sampleCard));
